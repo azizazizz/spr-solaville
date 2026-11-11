@@ -266,7 +266,7 @@ export default function SprForm({
                 aria-invalid={errors.bookingFee ? "true" : undefined}
                 aria-describedby={errors.bookingFee ? "spr-bookingFee-error" : undefined}
                 placeholder="0"
-                className="min-w-0 flex-1 bg-transparent px-2 py-3 text-fg outline-none"
+                className="min-w-0 flex-1 bg-transparent pl-0.5 pr-4 py-3 text-fg outline-none"
               />
             </div>
             {errors.bookingFee ? (

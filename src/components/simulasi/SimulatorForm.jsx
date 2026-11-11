@@ -38,7 +38,7 @@ export default function SimulatorForm({ values, onChange }) {
             value={values.harga ? formatThousands(values.harga) : ""}
             onChange={(event) => onChange({ ...values, harga: parseRupiahInput(event.target.value) })}
             placeholder="0"
-            className="min-w-0 flex-1 bg-transparent px-2 py-3 text-fg outline-none"
+            className="min-w-0 flex-1 bg-transparent pl-0.5 pr-4 py-3 text-fg outline-none"
           />
         </div>
         <span className="text-xs text-fg-soft">

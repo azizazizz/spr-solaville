@@ -6,6 +6,9 @@ import { siteConfig } from "../data/siteConfig"
 import logoMark from "../assets/logo/logo-mark-pdf.png?inline"
 
 const HEADER_FILL = [15, 46, 32] // --color-night (#0f2e20)
+const TEXT_COLOR = [0, 0, 0]
+const LINE_COLOR = [0, 0, 0]
+const LINE_WIDTH_MM = 0.25
 // Rasio asli monogram 185x122, ditampilkan 12 mm tinggi supaya tidak melar
 const LOGO_HEIGHT_MM = 12
 const LOGO_WIDTH_MM = LOGO_HEIGHT_MM * (185 / 122)
@@ -26,14 +29,22 @@ const PENUTUP =
 const TEXT_WIDTH_MM = 182
 const NUMBER_INDENT_MM = 6
 
+// Nomor SPR: SPR/SOLAVILLE/DDMMYYYY/NNNN. DDMMYYYY adalah tanggal pembuatan, NNNN nomor acak 4 digit.
+// Nomor acak dipilih karena aplikasi tidak punya server yang menghitung nomor urut lintas perangkat: dua
+// perangkat berbeda bisa sama-sama memberi "0001". Peluang dua SPR di hari yang sama mendapat nomor identik
+// sekitar 1 banding 10.000 per pasangan; naikkan SPR_NUMBER_DIGITS bila volume harian tinggi.
+const SPR_NUMBER_DIGITS = 4
+
+function randomDigits(length) {
+  const max = 10 ** length
+  return String(crypto.getRandomValues(new Uint32Array(1))[0] % max).padStart(length, "0")
+}
+
 export function buildSprNumber() {
   const now = new Date()
-  const stamp = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, "0")}${String(
-    now.getDate(),
-  ).padStart(2, "0")}${String(now.getHours()).padStart(2, "0")}${String(
-    now.getMinutes(),
-  ).padStart(2, "0")}`
-  return `SPR/${siteConfig.brandName.toUpperCase()}/${stamp}`
+  const dd = String(now.getDate()).padStart(2, "0")
+  const mm = String(now.getMonth() + 1).padStart(2, "0")
+  return `SPR/${siteConfig.brandName.toUpperCase()}/${dd}${mm}${now.getFullYear()}/${randomDigits(SPR_NUMBER_DIGITS)}`
 }
 
 // Pengaturan tabel yang sama untuk ketiga bagian: kolom label selebar sama supaya sejajar,
@@ -44,8 +55,15 @@ function sectionTable(doc, startY, title, rows) {
     theme: "grid",
     head: [[{ content: title, colSpan: 2 }]],
     body: rows,
-    styles: { fontSize: 9, cellPadding: { vertical: 1.1, horizontal: 3 } },
-    headStyles: { fillColor: HEADER_FILL },
+    // Teks isian hitam pekat dan garis hitam 0,25 mm supaya tabel tetap jelas saat dicetak atau difotokopi
+    styles: {
+      fontSize: 9,
+      cellPadding: { vertical: 1.1, horizontal: 3 },
+      textColor: TEXT_COLOR,
+      lineColor: LINE_COLOR,
+      lineWidth: LINE_WIDTH_MM,
+    },
+    headStyles: { fillColor: HEADER_FILL, textColor: [255, 255, 255] },
     columnStyles: { 0: { cellWidth: 60 } },
   })
   return doc.lastAutoTable.finalY

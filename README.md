@@ -57,6 +57,7 @@ src/
 - **Booking fee bawaan:** `bookingFee` di `src/data/siteConfig.js`. Pemesan tetap bisa mengubahnya di form.
 - **Tipe unit dan luasnya:** `src/data/units.js`. Nama tipe, luas tanah, dan luas bangunan ikut tercetak di PDF.
 - **DP, tenor, dan suku bunga:** `DP_PERSEN`, `TENOR_OPTIONS`, dan `RATE_OPTIONS` di `src/utils/loan.js`.
+- **Format nomor SPR:** `buildSprNumber` di `src/utils/sprDocument.js`. Bentuknya `SPR/SOLAVILLE/DDMMYYYY/NNNN` (tanggal pembuatan dan 4 digit acak). Jumlah digit diatur oleh `SPR_NUMBER_DIGITS`.
 - **Isi ketentuan di PDF:** konstanta `CATATAN`, `KETENTUAN`, dan `PENUTUP` di `src/utils/sprDocument.js`.
 - **Warna dan tema:** blok `@theme` dan `.dark` di `src/index.css`.
 

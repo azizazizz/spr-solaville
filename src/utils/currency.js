@@ -1,9 +1,7 @@
+// Format penulisan rupiah Indonesia: "Rp" menempel pada angka tanpa spasi, titik sebagai pemisah ribuan (Rp10.000)
 export function formatRupiah(number) {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    maximumFractionDigits: 0,
-  }).format(number)
+  const digits = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(Math.abs(number))
+  return `${number < 0 ? "-" : ""}Rp${digits}`
 }
 
 // Batas wajar agar tampilan tidak rusak ("Rp∞", "RpNaN") oleh input ekstrem

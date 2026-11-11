@@ -1,0 +1,154 @@
+@import "tailwindcss";
+
+/* Dark mode diaktifkan lewat class ".dark" di <html>, bukan hanya mengikuti OS */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Montserrat", sans-serif;
+  --font-body: "Mulish", sans-serif;
+
+  /*
+   * Palet diambil dari logo Solaville: hijau hutan (daun dan huruf SV) sebagai warna utama,
+   * emas (garis dan tulisan SOLA VILLE) sebagai satu-satunya aksen, putih dan krem hangat sebagai netral.
+   * Token adaptif: nilainya berbeda di light vs dark mode (lihat blok .dark di bawah).
+   */
+  --color-base: #ffffff;
+  --color-base-alt: #eee9da;
+  --color-primary: #224831;
+  --color-primary-dark: #173021;
+  --color-on-primary: #faf8f2;
+  --color-fg: #14261b;
+  --color-fg-soft: #4b5a4f;
+
+  /* Aksen emas, nilainya sama di kedua mode. gold dipakai di atas panel gelap, gold-soft sebagai tint */
+  --color-gold: #d4a94a;
+  --color-gold-soft: #e4cc84;
+
+  /* Khusus validasi form (adaptif, lihat blok .dark di bawah) */
+  --color-danger: #b83232;
+
+  /* Token tetap: panel yang memang harus selalu gelap (footer, overlay modal) */
+  --color-night: #0f2e20;
+  --color-night-soft: #174230;
+  --color-on-night: #f6f3e8;
+
+  /*
+   * Animasi dipakai terbatas dan masing-masing punya tujuan UX (lihat catatan di tiap komponen).
+   * Fill-mode sengaja "backwards", bukan "both": setelah selesai, elemen kembali ke gaya aslinya
+   * sehingga tidak ada transform/opacity yang tertinggal (yang bisa mengubah posisi elemen fixed
+   * di dalamnya, seperti modal, atau urutan tumpukan z-index).
+   */
+  --animate-fade-in: fade-in 0.25s ease-out backwards;
+  --animate-rise-in: rise-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  --animate-pop-in: pop-in 0.22s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes rise-in {
+    from {
+      opacity: 0;
+      transform: translateY(var(--rise, 14px));
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+.dark {
+  --color-base: #0d1a12;
+  --color-base-alt: #162a1e;
+  /* Hijau dilunakkan agar terbaca di latar gelap: kontras 8,1:1 di atas base dan 6,9:1 di atas panel */
+  --color-primary: #6dbf8e;
+  /* Warna hover tombol: di dark mode justru lebih terang, supaya teks gelap di atasnya tetap kontras */
+  --color-primary-dark: #8fd0a9;
+  /* Teks di atas tombol primary: gelap di dark mode (kontras 7,9:1) */
+  --color-on-primary: #0a1d12;
+  --color-fg: #f0eee3;
+  --color-fg-soft: #a8b8ab;
+  --color-danger: #ee8a8a;
+}
+
+/* Fokus keyboard yang jelas untuk semua elemen interaktif; input memakai ring sendiri (lihat komponen form) */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+  }
+
+  /* Hijau utama nyaris tak terlihat di atas panel gelap (kontras 1,3:1), jadi fokus di sana memakai emas */
+  :where(.bg-night) :focus-visible {
+    outline-color: var(--color-gold);
+  }
+
+  /* Tailwind 4 mengembalikan kursor tombol ke panah; kontrol yang aktif harus terlihat bisa diklik */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  a[href],
+  summary,
+  select:not(:disabled),
+  label[for],
+  input[type="checkbox"]:not(:disabled),
+  input[type="radio"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  select:disabled,
+  input:disabled {
+    cursor: not-allowed;
+  }
+}
+
+html {
+  color-scheme: light;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--color-base);
+  color: var(--color-fg);
+  font-family: var(--font-body);
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+}
+
+/* Hormati preferensi sistem: pengguna yang meminta gerak minimal tidak melihat animasi apa pun */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

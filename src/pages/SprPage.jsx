@@ -41,16 +41,17 @@ export default function SprPage() {
   const [simulasi] = useState(() => loadSimulation())
   const [buyer, setBuyer] = useState(() => getSprDraft().buyer)
   const [unitIdentity, setUnitIdentity] = useState(() => getSprDraft().unitIdentity)
+  const [parties, setParties] = useState(() => getSprDraft().parties)
 
   useEffect(() => {
-    saveSprDraft({ buyer, unitIdentity })
-  }, [buyer, unitIdentity])
+    saveSprDraft({ buyer, unitIdentity, parties })
+  }, [buyer, unitIdentity, parties])
 
   const detail = simulasi ? resolveSimulation(simulasi) : null
 
   // Simpan salinan SPR yang baru dibuat (untuk ringkasan dan unduh ulang), lalu ke langkah 3
   function handleComplete({ sprNumber, tanggal }) {
-    saveCompletedSpr({ sprNumber, tanggal, buyer, unitIdentity, simulasi })
+    saveCompletedSpr({ sprNumber, tanggal, buyer, unitIdentity, parties, simulasi })
     navigate("/selesai")
   }
 
@@ -101,6 +102,8 @@ export default function SprPage() {
               onBuyerChange={setBuyer}
               unitIdentity={unitIdentity}
               onUnitIdentityChange={setUnitIdentity}
+              parties={parties}
+              onPartiesChange={setParties}
               result={detail}
               onComplete={handleComplete}
             />

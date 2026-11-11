@@ -15,3 +15,9 @@ export const EMPTY_UNIT_IDENTITY = {
   noUnit: "",
   bookingFee: siteConfig.bookingFee,
 }
+
+// Nama yang dicetak di bawah tanda tangan Marketing dan Agency. Diisi manual, boleh kosong.
+export const EMPTY_PARTIES = {
+  namaMarketing: "",
+  namaAgency: "",
+}

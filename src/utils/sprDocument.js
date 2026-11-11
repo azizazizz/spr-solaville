@@ -13,13 +13,13 @@ const LINE_WIDTH_MM = 0.25
 const LOGO_HEIGHT_MM = 12
 const LOGO_WIDTH_MM = LOGO_HEIGHT_MM * (185 / 122)
 
-const CATATAN =
-  "Dokumen ini adalah surat pesanan awal dan bukan bukti pelunasan. Nilai plafon KPR bersifat estimasi dan dapat berubah sesuai hasil verifikasi dan kebijakan bank."
+// Penulisan nama perumahan di dokumen (di nomor SPR dan nama berkas tetap SOLAVILLE tanpa spasi)
+const NAMA_PERUMAHAN = "Sola Ville"
 
 const KETENTUAN = [
+  "Dokumen ini adalah surat pesanan awal dan bukan bukti pelunasan. Nilai plafon KPR disesuaikan dengan KPR yang disetujui oleh Bank. Jika terjadi selisih, maka selisihnya harus dibayarkan debitur sebelum akad kredit.",
   "Pembelian rumah tersebut akan diajukan melalui fasilitas KPR dan transaksi jual beli akan dilaksanakan setelah pengajuan KPR disetujui oleh pihak Bank.",
-  "Apabila pengajuan KPR tidak disetujui oleh Bank, maka para pihak sepakat untuk menyelesaikannya sesuai dengan kesepakatan bersama.",
-  "Proses jual beli akan dituangkan dalam Akta Jual Beli (AJB) di hadapan Pejabat Pembuat Akta Tanah (PPAT) setelah seluruh persyaratan administrasi dari pembeli, penjual, dan pihak Bank terpenuhi.",
+  "Apabila pengajuan KPR tidak disetujui oleh Bank, dan atau debitur membatalkan secara sepihak maka booking fee hangus.",
 ]
 
 const PENUTUP =
@@ -73,6 +73,7 @@ function sectionTable(doc, startY, title, rows) {
 export function generateSprPdf({
   buyer,
   unitIdentity,
+  parties,
   unit,
   harga,
   result,
@@ -98,7 +99,7 @@ export function generateSprPdf({
   doc.text(`No: ${sprNumber}`, 105, 25, { align: "center" })
 
   doc.setFontSize(10.5)
-  doc.text(`Perumahan ${siteConfig.brandName}`, 14, 35)
+  doc.text(`Perumahan ${NAMA_PERUMAHAN}`, 14, 35)
   doc.text(`Tanggal: ${today}`, 14, 41)
 
   let y = sectionTable(doc, 47, "Data Diri Pemesan", [
@@ -123,17 +124,16 @@ export function generateSprPdf({
     ["Booking Fee", formatRupiah(unitIdentity.bookingFee || 0)],
   ])
 
-  // Catatan, ketentuan, dan tanda tangan selalu satu blok; bila tidak muat di halaman ini (alamat sangat panjang),
+  // Ketentuan dan tanda tangan selalu satu blok; bila tidak muat di halaman ini (alamat sangat panjang),
   // seluruh blok pindah ke halaman berikutnya agar halaman tanda tangan tidak berdiri sendiri tanpa isi.
   doc.setFontSize(9)
   const LINE = 4.2 // mm per baris teks 9 pt
-  const catatan = doc.splitTextToSize(CATATAN, TEXT_WIDTH_MM)
   const ketentuan = KETENTUAN.map((item) => doc.splitTextToSize(item, TEXT_WIDTH_MM - NUMBER_INDENT_MM))
   const penutup = doc.splitTextToSize(PENUTUP, TEXT_WIDTH_MM)
   const ketentuanLines = ketentuan.reduce((sum, lines) => sum + lines.length, 0)
   const signatureHeight = 40
   const blockHeight =
-    catatan.length * LINE + 4 + LINE + ketentuanLines * LINE + ketentuan.length * 1 + 3 + penutup.length * LINE + 6 + signatureHeight
+    LINE + ketentuanLines * LINE + ketentuan.length * 1 + 3 + penutup.length * LINE + 6 + signatureHeight
 
   let top = y + 8
   if (top + blockHeight > pageHeight - 12) {
@@ -141,8 +141,7 @@ export function generateSprPdf({
     top = 20
   }
 
-  doc.text(catatan, 14, top)
-  let cursor = top + catatan.length * LINE + 4
+  let cursor = top
 
   doc.setFont("helvetica", "bold")
   doc.text("Ketentuan:", 14, cursor)
@@ -159,14 +158,17 @@ export function generateSprPdf({
   cursor += penutup.length * LINE + 6
 
   const signY = cursor
-  doc.text("Pemesan,", 45, signY, { align: "center" })
-  doc.text("Pihak Developer,", 150, signY, { align: "center" })
-  doc.text("(____________________)", 45, signY + 20, { align: "center" })
-  doc.text("(____________________)", 150, signY + 20, { align: "center" })
-  doc.text(doc.splitTextToSize(buyer.namaLengkap || "Nama Pemesan", 70), 45, signY + 25, {
-    align: "center",
+  // Tiga tanda tangan sejajar: Debitur (nama dari data pemesan), Marketing dan Agency (nama diisi manual, boleh kosong)
+  const penandatangan = [
+    { x: 40, peran: "Debitur,", nama: buyer.namaLengkap || "Nama Debitur" },
+    { x: 105, peran: "Marketing,", nama: parties?.namaMarketing || "" },
+    { x: 170, peran: "Agency,", nama: parties?.namaAgency || "" },
+  ]
+  penandatangan.forEach(({ x, peran, nama }) => {
+    doc.text(peran, x, signY, { align: "center" })
+    doc.text("(____________________)", x, signY + 20, { align: "center" })
+    if (nama) doc.text(doc.splitTextToSize(nama, 55), x, signY + 25, { align: "center" })
   })
-  doc.text(doc.splitTextToSize(`Perumahan ${siteConfig.brandName}`, 70), 150, signY + 25, { align: "center" })
 
   doc.save(`${sprNumber.replaceAll("/", "-")}.pdf`)
 }

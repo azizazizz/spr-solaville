@@ -32,7 +32,7 @@ export default function SelesaiPage() {
   // Tanpa SPR yang baru dibuat (mis. halaman dimuat ulang), tidak ada yang bisa ditampilkan
   if (!completed) return <Navigate to="/spr" replace />
 
-  const { sprNumber, tanggal, buyer, unitIdentity, simulasi } = completed
+  const { sprNumber, tanggal, buyer, unitIdentity, parties, simulasi } = completed
   const result = resolveSimulation(simulasi)
   const unit = result.unit
   const tanggalLabel = new Date(tanggal).toLocaleDateString("id-ID", {
@@ -56,6 +56,7 @@ export default function SelesaiPage() {
       generateSprPdf({
         buyer,
         unitIdentity,
+        parties,
         unit,
         harga: result.harga,
         result,
@@ -121,6 +122,8 @@ export default function SelesaiPage() {
           <SummaryItem label="Tanggal" value={tanggalLabel} />
           <SummaryItem label="Nama Pemesan" value={buyer.namaLengkap} />
           <SummaryItem label="Unit" value={unitLabel} />
+          <SummaryItem label="Marketing" value={parties.namaMarketing || "-"} />
+          <SummaryItem label="Agency" value={parties.namaAgency || "-"} />
           <SummaryItem label="Harga Jual" value={formatRupiah(result.harga)} />
           <SummaryItem label="DP" value={`${formatRupiah(result.dp)}, diskon ${formatRupiah(result.diskonDp)}`} />
           <SummaryItem label="Booking Fee" value={formatRupiah(unitIdentity.bookingFee)} />

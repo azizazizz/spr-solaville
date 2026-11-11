@@ -47,6 +47,8 @@ export default function SprForm({
   onBuyerChange,
   unitIdentity,
   onUnitIdentityChange,
+  parties,
+  onPartiesChange,
   result,
   onComplete,
 }) {
@@ -89,6 +91,10 @@ export default function SprForm({
     updateBuyer("noHp", event.target.value.replace(/[^\d+\s()-]/g, ""))
   }
 
+  function updateParties(field, value) {
+    onPartiesChange({ ...parties, [field]: value })
+  }
+
   function handleBookingFeeChange(event) {
     updateUnitIdentity("bookingFee", parseRupiahInput(event.target.value))
   }
@@ -115,6 +121,7 @@ export default function SprForm({
       generateSprPdf({
         buyer,
         unitIdentity,
+        parties,
         unit,
         harga,
         result,
@@ -286,6 +293,33 @@ export default function SprForm({
             Luas tanah / bangunan: <span className="text-fg">{unit.luasTanah} m² / {unit.luasBangunan} m²</span>
           </p>
         ) : null}
+      </div>
+
+      <div>
+        <h2 className="text-fg font-medium mb-4">Marketing dan Agency</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <TextField
+            name="namaMarketing"
+            label="Nama Marketing"
+            value={parties.namaMarketing}
+            onChange={(event) => updateParties("namaMarketing", event.target.value)}
+            autoComplete="off"
+            maxLength={60}
+            placeholder="Nama marketing yang menangani"
+          />
+          <TextField
+            name="namaAgency"
+            label="Nama Agency"
+            value={parties.namaAgency}
+            onChange={(event) => updateParties("namaAgency", event.target.value)}
+            autoComplete="off"
+            maxLength={60}
+            placeholder="Nama agency"
+          />
+        </div>
+        <p className="mt-2 text-xs text-fg-soft">
+          Dicetak di bawah tanda tangan Marketing dan Agency. Boleh dikosongkan, lalu ditulis tangan.
+        </p>
       </div>
 
       <div className="flex flex-col items-start gap-3">

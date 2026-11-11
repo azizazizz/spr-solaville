@@ -75,10 +75,8 @@ src/
 
 ## Deploy
 
-Hasil build (`dist`) adalah situs statis. Karena memakai rute di sisi browser, hosting harus mengarahkan semua alamat ke `index.html`, kalau tidak membuka `/spr` atau `/selesai` langsung akan 404. Di Vercel, tambahkan `vercel.json` berisi:
+Hasil build (`dist`) adalah situs statis. Karena memakai rute di sisi browser, hosting harus mengarahkan semua alamat ke `index.html`, kalau tidak membuka atau me-refresh `/simulasi`, `/spr`, atau `/selesai` akan menghasilkan 404.
 
-```json
-{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
-```
-
-Di Netlify, tambahkan berkas `public/_redirects` berisi `/* /index.html 200`.
+- **Vercel:** sudah ditangani oleh `vercel.json` di root project (aturan `rewrites` ke `index.html`, plus cache panjang untuk berkas di `/assets`). Tidak ada pengaturan tambahan; preset framework Vite dengan perintah `npm run build` dan folder keluaran `dist` sudah cukup.
+- **Netlify:** tambahkan berkas `public/_redirects` berisi `/* /index.html 200`.
+- **Hosting lain:** setel aturan fallback yang setara, yaitu semua alamat yang bukan berkas dilayani dengan `index.html`.
